@@ -1,6 +1,7 @@
 package com.codingshuttle.omkar.module1;
 
 import com.codingshuttle.omkar.module1.impl.EmailNotificationService;
+import com.codingshuttle.omkar.module1.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
@@ -10,6 +11,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Module1Application implements CommandLineRunner {
 
+    private final CakeBaker cakeBaker;
+    final NotificationService notificationserviceobj;    //field dependency injection//not prefered
+
     @Autowired
     PaymentService paymentserviceobj1;
 
@@ -17,14 +21,15 @@ public class Module1Application implements CommandLineRunner {
     PaymentService paymentserviceobj2;
 
 //    @Autowired
-   final NotificationService notificationserviceobj;    //field dependency injection//not prefered
+
 
 //    public Module1Application(@Qualifier("Emailnotif) NotificationService notificationserviceobj) {
 //        this.notificationserviceobj = notificationserviceobj;          //constructor dependency injection// preferred// qualifier used
 //    }
 
-    public Module1Application(NotificationService notificationserviceobj) {
+    public Module1Application(NotificationService notificationserviceobj, CakeBaker cakeBaker) {
         this.notificationserviceobj = notificationserviceobj;          //constructor dependency injection// preferred// conditional on property used
+        this.cakeBaker = cakeBaker;
     }
 
     public static void main(String[] args) {
@@ -36,6 +41,7 @@ public class Module1Application implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         notificationserviceobj.send("hello");
+        cakeBaker.bakeCake();
 
         //not the springboot way
 //        NotificationService notiservice = new EmailNotificationService();
