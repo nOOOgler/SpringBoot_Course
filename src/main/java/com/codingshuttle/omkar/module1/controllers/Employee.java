@@ -2,8 +2,10 @@ package com.codingshuttle.omkar.module1.controllers;
 
 import com.codingshuttle.omkar.module1.Dto.EmployeeDto;
 import com.codingshuttle.omkar.module1.entities.EmployeeEntity;
+import com.codingshuttle.omkar.module1.exceptions.ResourceNotFoundException;
 import com.codingshuttle.omkar.module1.repositories.EmployeeRepository;
 import com.codingshuttle.omkar.module1.services.EmployeeService;
+import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -33,7 +36,7 @@ public class Employee {
         Optional<EmployeeDto> employeeDto = employeeService.getEmployee(id);
         return employeeDto
                 .map(employeeDto1 -> ResponseEntity.ok(employeeDto1))
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
     }
 
     @GetMapping
@@ -45,7 +48,7 @@ public class Employee {
     }
 
     @PostMapping
-    public ResponseEntity<EmployeeDto> createNewEmployee(@RequestBody EmployeeDto inputEmployee){
+    public ResponseEntity<EmployeeDto> createNewEmployee(@RequestBody @Valid EmployeeDto inputEmployee){            //@valid to apply validations declared in DTO
 //        inputEmployee.setId(100L);
   //      return employeeRepository.save(inputEmployee);
         EmployeeDto savedEmployee = employeeService.createNewEmployee((inputEmployee));

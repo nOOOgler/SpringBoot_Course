@@ -1,8 +1,8 @@
 package com.codingshuttle.omkar.module1.services;
 
 import com.codingshuttle.omkar.module1.Dto.EmployeeDto;
-import com.codingshuttle.omkar.module1.controllers.Employee;
 import com.codingshuttle.omkar.module1.entities.EmployeeEntity;
+import com.codingshuttle.omkar.module1.exceptions.ResourceNotFoundException;
 import com.codingshuttle.omkar.module1.repositories.EmployeeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -46,28 +46,26 @@ public class EmployeeService {
     }
 
     public EmployeeDto updateEmployeeById(Long employeeId, EmployeeDto employeeData) {
+        isExistsByEmployeeId(employeeId);
         EmployeeEntity employeeEntity = modelMapper.map(employeeData, EmployeeEntity.class);
         employeeEntity.setId(employeeId);
         EmployeeEntity updatedEntity = employeeRepository.save(employeeEntity);
         return modelMapper.map(updatedEntity, EmployeeDto.class);
     }
 
-    public boolean isExistsByEmployeeId(Long employeeId){
-        return employeeRepository.existsById(employeeId);
+    public void isExistsByEmployeeId(Long employeeId){
+        boolean exists =  employeeRepository.existsById(employeeId);
+        if(!exists) throw new ResourceNotFoundException("Resource not found with id: " + employeeId);
     }
 
     public boolean deleteEmployee(Long employeeId) {
-        boolean exists = isExistsByEmployeeId(employeeId);
-        if(exists) {
-            employeeRepository.deleteById(employeeId);
-            return true;
-        }
-        return false;
+        isExistsByEmployeeId(employeeId);
+        employeeRepository.deleteById(employeeId);
+        return true;
     }
 
     public EmployeeDto updatePartialEmployee(Map<String, Object> updates, Long employeeId) {
-        boolean exists = isExistsByEmployeeId(employeeId);
-        if(!exists) return null;
+        isExistsByEmployeeId(employeeId);
         EmployeeEntity employeeEntity = employeeRepository.findById(employeeId).get();
         updates.forEach((key,value)->{
             Field field = ReflectionUtils.findField(EmployeeEntity.class, key);
